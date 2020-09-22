@@ -107,6 +107,24 @@ class initface():
         self.workimage = ImageTk.PhotoImage(
             Image.open("srcimage/looking.jpg").resize(
                 (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working0 = ImageTk.PhotoImage(
+            Image.open("srcimage/working0.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working1 = ImageTk.PhotoImage(
+            Image.open("srcimage/working1.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working2 = ImageTk.PhotoImage(
+            Image.open("srcimage/working2.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working3 = ImageTk.PhotoImage(
+            Image.open("srcimage/working3.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working4 = ImageTk.PhotoImage(
+            Image.open("srcimage/working4.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.working5 = ImageTk.PhotoImage(
+            Image.open("srcimage/working5.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
         self.closeimage = ImageTk.PhotoImage(
             Image.open("srcimage/close.jpg").resize(
                 (int(self.closebtnwidth), int(self.closebtnwidth))))
@@ -144,7 +162,7 @@ class initface():
         self.titleCanvas.configure(highlightthickness=0)
         # 中间的按钮
         self.buttonB = tk.Button(self.initface,
-                                 image=self.workimage,
+                                 image=self.working0,
                                  height=int(winheight / 2),
                                  width=int(winwidth / 3),
                                  relief="ridge")
@@ -184,6 +202,7 @@ class initface():
         self.closebtn.place(x=winwidth - self.closebtnwidth, y=0)
         self.hearto2page = [] 
         #刷新显示图片
+        _thread.start_new_thread(self.workinggif,("treadname",1))
         self.showtitle()
         
 
@@ -313,11 +332,37 @@ class initface():
                 pass
             arrayr.append(item)
         return arrayr
+    def workinggif(self,treadname,x):
+        flag = 0
+        plus = True
+        while True:
+            if flag == 0:
+                self.buttonB.config(image=self.working0)
+            if flag == 1:
+                self.buttonB.config(image=self.working1)
+            if flag == 2:
+                self.buttonB.config(image=self.working2)
+            if flag == 3:
+                self.buttonB.config(image=self.working3)
+            if flag == 4:
+                self.buttonB.config(image=self.working4)
+            if flag == 5:
+                self.buttonB.config(image=self.working5)
+            if plus:
+                flag = flag + 1
+            else:
+                flag = flag - 1
+            if flag ==5:
+                plus = False
+            if flag ==0:
+                plus = True
+            time.sleep(0.2)
+
 
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':
-    _thread.start_new_thread(start,("threadname",1))
+    #_thread.start_new_thread(start,("threadname",1))
     root = tk.Tk()
     #全屏应用
     root.attributes("-fullscreen", True)
@@ -328,10 +373,3 @@ if __name__ == '__main__':
     winheight = root.winfo_screenheight()
     basedesk(root)
     root.mainloop()
-
-# root = tk.Tk()
-
-# img_png = tkinter.PhotoImage(file = 'banana.gif')
-# label_img = tkinter.Label(root, image = img_png)
-# label_img.pack()
-# root.mainloop()

@@ -32,6 +32,24 @@ class heartpage():
         self.waitingimage = ImageTk.PhotoImage(
             Image.open("srcimage/waiting.jpg").resize(
                 (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting0 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting0.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting1 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting1.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting2 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting2.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting3 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting3.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting4 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting4.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
+        self.waiting5 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting5.jpg").resize(
+                (int(self.startbtnwidth), int(self.startbtnwidth))))
          #背景
         bg = background(self.heartpage,self.winheight,self.winwidth,"call")
         #返回按钮
@@ -44,8 +62,8 @@ class heartpage():
     def start(self):
         if not self.working:
             _thread.start_new_thread(self.mainclass.bloodpressuretest,(self,"threadname",1))
-            self.startbtn.config(image = self.waitingimage)
             self.working = True
+            _thread.start_new_thread(self.waitinggif,("threadname",1))
         else:
             pass
     def showresult(self,resultlist):
@@ -56,6 +74,31 @@ class heartpage():
         self.working = False
         self.startbtn.config(image = self.btnimage)
         result(self.heartpage,self.winheight,self.winwidth,-1)
+    def waitinggif(self,threadname,x):
+        flag = 0
+        plus = True
+        while self.working:
+            if flag == 0:
+                self.startbtn.config(image=self.waiting0)
+            if flag == 1:
+                self.startbtn.config(image=self.waiting1)
+            if flag == 2:
+                self.startbtn.config(image=self.waiting2)
+            if flag == 3:
+                self.startbtn.config(image=self.waiting3)
+            if flag == 4:
+                self.startbtn.config(image=self.waiting4)
+            if flag == 5:
+                self.startbtn.config(image=self.waiting5)
+            if plus:
+                flag = flag + 1
+            else:
+                flag = flag - 1
+            if flag == 5:
+                plus = False
+            if flag == 0:
+                plus = True
+            time.sleep(0.2)
 class result():
     def __init__(self,master,_winheight,_winwidth,resultlist):
         self.winheight = _winheight
