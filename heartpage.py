@@ -29,9 +29,6 @@ class heartpage():
         self.btnimage = ImageTk.PhotoImage(
             Image.open("srcimage/startm.jpg").resize(
                 (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waitingimage = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
         self.waiting0 = ImageTk.PhotoImage(
             Image.open("srcimage/waiting0.jpg").resize(
                 (int(self.startbtnwidth), int(self.startbtnwidth))))

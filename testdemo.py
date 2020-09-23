@@ -165,7 +165,8 @@ class initface():
                                  image=self.working0,
                                  height=int(winheight / 2),
                                  width=int(winwidth / 3),
-                                 relief="ridge")
+                                 relief="ridge",
+                                 bd=0)
         self.buttonB.place(x=self.move[4][0], y=self.move[4][1])
         # 左边的三个按钮
         self.buttonC_1 = tk.Button(self.initface,
@@ -245,10 +246,10 @@ class initface():
         def video_loop():
             try:
                 while True:
-                    self.initface.create_image(0,
-                                               0,
-                                               anchor='nw',
-                                               image=self.backgroundimage)
+                    # self.initface.create_image(0,
+                    #                            0,
+                    #                            anchor='nw',
+                    #                            image=self.backgroundimage)
                     self.titleCanvas.create_image(0,
                                                   0,
                                                   anchor='nw',
