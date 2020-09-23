@@ -204,6 +204,7 @@ class initface():
         self.hearto2page = [] 
         #刷新显示图片
         _thread.start_new_thread(self.workinggif,("treadname",1))
+        _thread.start_new_thread(self.readtext,("treadname",1))
         self.showtitle()
         
 
@@ -358,8 +359,15 @@ class initface():
             if flag ==0:
                 plus = True
             time.sleep(0.2)
-
-
+    def readtext(self,treadname,x):
+        while True:
+            with open('out.txt', 'r') as file_to_read:
+                while True:
+                    lines = file_to_read.readline() # 整行读取数据
+                    if not lines:
+                        break
+                    print(lines)
+            time.sleep(1)
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':
