@@ -203,8 +203,9 @@ class initface():
         self.closebtn.place(x=winwidth - self.closebtnwidth, y=0)
         self.hearto2page = [] 
         #刷新显示图片
-        _thread.start_new_thread(self.workinggif,("treadname",1))
         _thread.start_new_thread(self.showtitle,("threadname",1))
+        _thread.start_new_thread(self.readtext,("treadname",1))
+        self.showtitle()
         
 
     def gotovideo(self):
@@ -467,6 +468,15 @@ class littleface():
         self.small = True
         # self.emojiid = x
         # self.smiling = False
+    def readtext(self,treadname,x):
+        while True:
+            with open('out.txt', 'r') as file_to_read:
+                while True:
+                    lines = file_to_read.readline() # 整行读取数据
+                    if not lines:
+                        break
+                    print(lines)
+            time.sleep(1)
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':
