@@ -2,9 +2,11 @@ import os
 from mttkinter import mtTkinter as tk
 import tkinter.colorchooser
 import pygame as py
+import numpy as np
 import time
 import _thread
 from tkinter import *
+from aip import AipSpeech
 import serial
 import array
 import cv2
@@ -17,9 +19,16 @@ from musicpage import musicpage  #音乐界面
 from callpage import callpage  #拨打电话界面
 from hearto2page import hearto2page #血氧浓度检测
 from heartpage import heartpage #心率测量
+import sounddevice as sd
 winwidth = 0
 winheight = 0
+app_id = "22734117"
+api_key = "dGN7IjSC9ZbeaEb9wpumWF8I"
+secret_key = "7wDCfXsZ8blwwa2peLOwVOHIoZuOyHUm"
 
+client = AipSpeech(app_id, api_key, secret_key)
+length = 2
+duration = 50  # seconds
 
 #桌面
 class basedesk():
@@ -79,6 +88,7 @@ class initface():
                 self.Bmovey + self.btnwidth * 3 / 2 + self.padding1 * 3 / 2
             ]
         ]
+        self.child = []
         #读取图片
         self.titleimage = ImageTk.PhotoImage(
             Image.open("srcimage/title.jpg").resize(
@@ -204,25 +214,27 @@ class initface():
         self.hearto2page = [] 
         #刷新显示图片
         _thread.start_new_thread(self.showtitle,("threadname",1))
-        _thread.start_new_thread(self.readtext,("treadname",1))
-        self.showtitle()
+        #_thread.start_new_thread(self.readtext,("treadname",1))
+        _thread.start_new_thread(self.starttest,("treadname",1))
+        #self.showtitle()
         
 
     def gotovideo(self):
         #self.initface.destroy()
-        videopage(self.master, winheight, winwidth)
+        self.child.append(videopage(self.master, winheight, winwidth))
 
-    def gotophoto(self):
+    def gotophoto(self,threadname = "threadname",x=1):
         #self.initface.destroy()
-        photopage(self.master, winheight, winwidth)
+        self.child.append(photopage(self.master, winheight, winwidth))
+        print("self.child===============================",len(self.child))
 
     def gotomusic(self):
-        musicpage(self.master, winheight, winwidth)
+        self.child.append(musicpage(self.master, winheight, winwidth))
     def gotohearto2(self):
         self.hearto2page.append(hearto2page(self,self.master,winheight,winwidth))
     #心率
     def gotoheartpage(self):
-        heartpage(self,self.master, winheight, winwidth)
+        self.child.append(heartpage(self,self.master, winheight, winwidth))
     #紧急呼救
     def emecall(self, event):
         #打开串口，波特率115200，无校验，停止位1，数据位8，连接超时2秒
@@ -359,6 +371,49 @@ class initface():
             if flag ==0:
                 plus = True
             time.sleep(0.2)
+    def readtext(self,treadname,x):
+        while True:
+            with open('out.txt', 'r') as file_to_read:
+                while True:
+                    lines = file_to_read.readline() # 整行读取数据
+                    if not lines:
+                        break
+                    print(lines)
+            time.sleep(1)
+    def test(self):
+        os.system("arecord -d %d -r 16000 -c 1 -t wav -f S16_LE record.wav" %
+            (length, ))
+        with open("record.wav", 'rb') as fp:
+            res = client.asr(fp.read(), 'wav', 16000, {
+                'dev_pid': 1537,
+            })
+        res = res['result'][0]
+        print(res)
+        if "照片" in res:
+            _thread.start_new_thread(self.gotophoto,("threadname",1))
+            return
+        if "视频" in res:
+            self.gotovideo()
+            return
+        if "音乐" in res:
+            self.gotomusic()
+            return
+        if "心率" in res:
+            self.gotoheartpage()
+            return
+        if "电话" in res:
+            self.callfamily()
+            return
+        if "退出" in res:
+            self.child[0].back()
+    def print_sound(self,indata, outdata, frames, time, status):
+        volume_norm = np.linalg.norm(indata)*10
+        if int(volume_norm)>100:
+            self.test()
+            print(int(volume_norm))
+    def starttest(self,threadname,x):
+        with sd.Stream(callback=self.print_sound):
+            sd.sleep(duration * 1000)
 class littleface():
     def __init__(self,master):
         self.master = master
@@ -468,15 +523,6 @@ class littleface():
         self.small = True
         # self.emojiid = x
         # self.smiling = False
-    def readtext(self,treadname,x):
-        while True:
-            with open('out.txt', 'r') as file_to_read:
-                while True:
-                    lines = file_to_read.readline() # 整行读取数据
-                    if not lines:
-                        break
-                    print(lines)
-            time.sleep(1)
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':
