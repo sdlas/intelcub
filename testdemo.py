@@ -28,8 +28,8 @@ class basedesk():
         self.root.config()
         self.root.title('Base page')
         self.root.geometry(str(winwidth) + 'x' + str(winheight))
-
         initface(self.root)
+        littleface(self.root)
 
 
 #初始界面
@@ -204,7 +204,7 @@ class initface():
         self.hearto2page = [] 
         #刷新显示图片
         _thread.start_new_thread(self.workinggif,("treadname",1))
-        self.showtitle()
+        _thread.start_new_thread(self.showtitle,("threadname",1))
         
 
     def gotovideo(self):
@@ -242,7 +242,7 @@ class initface():
     def callfamily(self):
         callpage(self.master, winheight, winwidth)
 
-    def showtitle(self):
+    def showtitle(self,threadname,x):
         def video_loop():
             try:
                 while True:
@@ -358,8 +358,115 @@ class initface():
             if flag ==0:
                 plus = True
             time.sleep(0.2)
+class littleface():
+    def __init__(self,master):
+        self.master = master
+        self.facepage = tk.Canvas(self.master,bg='white',width=winwidth,height=winheight,highlightthickness=0)
+        self.facepage.place(x=0,y=0)
+        self.littlewidth = 600
+        self.littleheight = self.littlewidth*winheight/winwidth
+        self.smile0 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile0.jpg").resize(
+                (int(winwidth), int(winheight))))
+        self.smile1 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile1.jpg").resize(
+                (int(winwidth), int(winheight))))
+        self.smile2 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile2.jpg").resize(
+                (int(winwidth), int(winheight))))
+        self.smile3 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile3.jpg").resize(
+                (int(winwidth), int(winheight))))
+        self.happy = ImageTk.PhotoImage(
+            Image.open("srcimage/happy.jpg").resize(
+                (int(winwidth), int(winheight))))
+        self.dislike = ImageTk.PhotoImage(
+            Image.open("srcimage/dislike.jpg").resize(
+                (int(winwidth), int(winheight))))
 
-
+        self.lsmile0 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile0.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile1 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile1.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile2 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile2.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile3 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile3.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lhappy = ImageTk.PhotoImage(
+            Image.open("srcimage/happy.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.ldislike = ImageTk.PhotoImage(
+            Image.open("srcimage/dislike.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.smiling = True
+        self.small = False
+        self.emojiid = 0
+        _thread.start_new_thread(self.playface,("threadname",1))
+        self.btn = tk.Button(self.facepage,bitmap="error",height=30,width=30,command=self.changeemoji)
+        self.btn.place(x=0,y=0)
+    def playface(self,treadname,x):
+        while True:
+            self.smileface()
+            if self.emojiid == 0:
+                self.happyface()
+            if self.emojiid == 1:
+                self.dislikeface()
+    def smileface(self):
+        flag = 0
+        plus = True
+        while self.smiling:
+            if self.small:
+                if flag ==0:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
+                if flag ==1:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile1)
+                if flag ==2:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile2)
+                if flag ==3:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile3)
+            else:
+                if flag ==0:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.smile0)
+                if flag ==1:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.smile1)
+                if flag ==2:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.smile2)
+                if flag ==3:
+                    self.facepage.create_image(0,0,anchor='nw',image=self.smile3)
+                
+            if plus:
+                flag = flag + 1
+            else:
+                flag = flag - 1
+            if flag == 0:
+                plus = True
+            if flag == 4:
+                plus = False
+            if plus:
+                time.sleep(0.05)
+            else:
+                time.sleep(0.1)
+            if flag == 1 and plus:
+                time.sleep(1.5)          
+    def happyface(self):
+        self.facepage.create_image(0,0,anchor='nw',image=self.happy)
+        time.sleep(2)
+        self.smiling = True
+    def dislikeface(self):
+        self.facepage.create_image(0,0,anchor='nw',image=self.dislike)
+        time.sleep(2)
+        self.smiling = True
+    def changeemoji(self,x=1):
+        self.facepage.config(width = self.littlewidth,height=self.littleheight)
+        self.facepage.place(x=(winwidth-self.littlewidth)/2,y=(winheight-self.littleheight)/2)
+        self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
+        self.small = True
+        # self.emojiid = x
+        # self.smiling = False
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':
