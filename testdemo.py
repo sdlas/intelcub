@@ -5,7 +5,6 @@ import pygame as py
 import numpy as np
 import time
 import _thread
-from tkinter import *
 from aip import AipSpeech
 import serial
 import array
@@ -19,6 +18,8 @@ from musicpage import musicpage  #音乐界面
 from callpage import callpage  #拨打电话界面
 from hearto2page import hearto2page #血氧浓度检测
 from heartpage import heartpage #心率测量
+from clockpage import clockpage #定时服药
+from envpage import envpage #环境监测
 import sounddevice as sd
 winwidth = 0
 winheight = 0
@@ -55,7 +56,7 @@ class initface():
         #常量定义
         self.closebtnwidth = 70  #关闭按钮的大小
         self.Bigbtnwidth = winwidth / 3  #中央大按钮的大小
-        self.btnwidth = winheight / 4  #普通按钮的大小
+        self.btnwidth = winheight / 5  #普通按钮的大小
         self.padding1 = 40  #普通按钮之间的间隔
         self.midlength = winwidth * 9 / 24
         self.sidelength = winwidth * 15 / 48
@@ -66,26 +67,44 @@ class initface():
         self.midmove = 60  #中间层按钮偏移量
         self.heartratelist = [80,90,69,110,102,79] #心跳速度列表
         self.oxygenlist = [89,90,98,96,87,92] #血氧浓度列表
+        self.twomove = 100
         #偏移量
         self.move = [
-            [self.Amovex, self.Bmovey - self.btnwidth / 2 - self.padding1 / 2],
             [
-                self.Amovex - self.midmove,
-                self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                [self.Amovex-self.twomove/2, self.Bmovey - self.btnwidth / 2 - self.padding1 / 2],
+                [
+                    self.Amovex - self.midmove-self.twomove,
+                    self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                ],
+                [
+                    self.Amovex -self.midmove+self.btnwidth+60-self.twomove,
+                    self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                ],
+                [
+                    self.Amovex-self.twomove/2,
+                    self.Bmovey + self.btnwidth * 3 / 2 + self.padding1 * 3 / 2
+                ]
             ],
             [
-                self.Amovex,
-                self.Bmovey + self.btnwidth * 3 / 2 + self.padding1 * 3 / 2
-            ], [winwidth / 3, 0], [winwidth / 3, self.Bmovey],
-            [self.sidelength, winheight * 5 / 6],
-            [self.Cmovex, self.Bmovey - self.btnwidth / 2 - self.padding1 / 2],
-            [
-                self.Cmovex + self.midmove,
-                self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                [winwidth / 3, 0], 
+                [winwidth / 3, self.Bmovey],
+                [winwidth / 3, self.Bmovey+self.Bigbtnwidth-90],
             ],
             [
-                self.Cmovex,
-                self.Bmovey + self.btnwidth * 3 / 2 + self.padding1 * 3 / 2
+                
+                [self.Cmovex+self.twomove/2, self.Bmovey - self.btnwidth / 2 - self.padding1 / 2],
+                [
+                    self.Cmovex + self.midmove-self.twomove,
+                    self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                ],
+                [
+                    self.Cmovex + self.midmove+self.btnwidth-self.twomove+60,
+                    self.Bmovey + self.btnwidth / 2 + self.padding1 / 2
+                ],
+                [
+                    self.Cmovex+self.twomove/2,
+                    self.Bmovey + self.btnwidth * 3 / 2 + self.padding1 * 3 / 2
+                ]
             ]
         ]
         self.child = []
@@ -114,8 +133,18 @@ class initface():
         self.hearto2image = ImageTk.PhotoImage(
             Image.open("srcimage/hearto2.jpg").resize(
                 (int(self.btnwidth), int(self.btnwidth))))
+        self.clockimage = ImageTk.PhotoImage(
+            Image.open("srcimage/clock.jpg").resize(
+                (int(self.btnwidth), int(self.btnwidth))))
+        self.environmentimage = ImageTk.PhotoImage(
+            Image.open("srcimage/environment.jpg").resize(
+                (int(self.btnwidth), int(self.btnwidth))))
+
         self.workimage = ImageTk.PhotoImage(
             Image.open("srcimage/looking.jpg").resize(
+                (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
+        self.faceback = ImageTk.PhotoImage(
+            Image.open("srcimage/faceback.jpg").resize(
                 (int(self.Bigbtnwidth), int(self.Bigbtnwidth))))
         self.working0 = ImageTk.PhotoImage(
             Image.open("srcimage/working0.jpg").resize(
@@ -145,39 +174,52 @@ class initface():
                                    width=self.btnwidth,
                                    relief="ridge",
                                    command=self.gotophoto,
-                                   bd=0)
-        self.buttonA_1.place(x=self.move[0][0], y=self.move[0][1])
+                                   bd=0,highlightthickness=0,
+                                   highlightcolor="white")
+        self.buttonA_1.place(x=self.move[0][0][0], y=self.move[0][0][1])
         self.buttonA_2 = tk.Button(self.initface,
                                    image=self.movieimage,
                                    height=self.btnwidth,
                                    width=self.btnwidth,
                                    relief="ridge",
                                    command=self.gotovideo,
-                                   bd=0)
-        self.buttonA_2.place(x=self.move[1][0], y=self.move[1][1])
+                                   bd=0,highlightthickness=0)
+        self.buttonA_2.place(x=self.move[0][1][0], y=self.move[0][1][1])
         self.buttonA_3 = tk.Button(self.initface,
                                    image=self.musicimage,
                                    height=self.btnwidth,
                                    width=self.btnwidth,
                                    relief="ridge",
                                    command=self.gotomusic,
-                                   bd=0)
-        self.buttonA_3.place(x=self.move[2][0], y=self.move[2][1])
+                                   bd=0,highlightthickness=0)
+        self.buttonA_3.place(x=self.move[0][2][0], y=self.move[0][2][1])
+        self.buttonA_4 = tk.Button(self.initface,
+                                   image=self.environmentimage,
+                                   height=self.btnwidth,
+                                   width=self.btnwidth,
+                                   relief="ridge",
+                                   command=self.gotoenvpage,
+                                   bd=0,highlightthickness=0)
+        self.buttonA_4.place(x=self.move[0][3][0], y=self.move[0][3][1])
         # 交大的校徽
         self.titleCanvas = tk.Canvas(self.initface,
                                      width=self.Bigbtnwidth,
                                      height=winheight / 6)
-        self.titleCanvas.place(x=self.move[3][0], y=self.move[3][1])
+        self.titleCanvas.place(x=self.move[1][0][0], y=self.move[1][0][1])
         self.titleCanvas.create_image(0, 0, anchor='nw', image=self.titleimage)
         self.titleCanvas.configure(highlightthickness=0)
         # 中间的按钮
         self.buttonB = tk.Button(self.initface,
-                                 image=self.working0,
+                                 image=self.faceback,
                                  height=int(winheight / 2),
                                  width=int(winwidth / 3),
                                  relief="ridge",
-                                 bd=0)
-        self.buttonB.place(x=self.move[4][0], y=self.move[4][1])
+                                 bd=0,highlightthickness=0)
+        self.buttonB.place(x=self.move[1][1][0], y=self.move[1][1][1])
+        #下面的文字
+        self.wordcanvas = tk.Canvas(self.initface,bg="white",width=winwidth/3,height=200,highlightthickness=0)
+        self.wordcanvas.place(x=self.move[1][2][0],y=self.move[1][2][1])
+        self.wordcanvas.create_text(winwidth/6,100,text="知心小雨为您服务",font=("宋体",30))
         # 左边的三个按钮
         self.buttonC_1 = tk.Button(self.initface,
                                    image=self.studyimage,
@@ -185,24 +227,32 @@ class initface():
                                    width=self.btnwidth,
                                    relief="ridge",
                                    command=self.emecall,
-                                   bd=0)
-        self.buttonC_1.place(x=self.move[6][0], y=self.move[6][1])
+                                   bd=0,highlightthickness=0)
+        self.buttonC_1.place(x=self.move[2][0][0], y=self.move[2][0][1])
         self.buttonC_2 = tk.Button(self.initface,
                                    image=self.gameimage,
                                    height=self.btnwidth,
                                    width=self.btnwidth,
                                    relief="ridge",
                                    command=self.callfamily,
-                                   bd=0)
-        self.buttonC_2.place(x=self.move[7][0], y=self.move[7][1])
+                                   bd=0,highlightthickness=0)
+        self.buttonC_2.place(x=self.move[2][1][0], y=self.move[2][1][1])
         self.buttonC_3 = tk.Button(self.initface,
+                                   image=self.clockimage,
+                                   height=self.btnwidth,
+                                   width=self.btnwidth,
+                                   relief="ridge",
+                                   bd=0,highlightthickness=0,
+                                   command = self.gotoclockpage)
+        self.buttonC_3.place(x=self.move[2][2][0], y=self.move[2][2][1])
+        self.buttonC_4 = tk.Button(self.initface,
                                    image=self.hearto2image,
                                    height=self.btnwidth,
                                    width=self.btnwidth,
                                    relief="ridge",
-                                   bd=0,
+                                   bd=0,highlightthickness=0,
                                    command = self.gotoheartpage)
-        self.buttonC_3.place(x=self.move[8][0], y=self.move[8][1])
+        self.buttonC_4.place(x=self.move[2][3][0], y=self.move[2][3][1])
         #关闭按钮
         self.closebtn = tk.Button(self.initface,
                                   image=self.closeimage,
@@ -216,7 +266,6 @@ class initface():
         _thread.start_new_thread(self.showtitle,("threadname",1))
         #_thread.start_new_thread(self.readtext,("treadname",1))
         _thread.start_new_thread(self.starttest,("treadname",1))
-        #self.showtitle()
         
 
     def gotovideo(self):
@@ -236,7 +285,7 @@ class initface():
     def gotoheartpage(self):
         self.child.append(heartpage(self,self.master, winheight, winwidth))
     #紧急呼救
-    def emecall(self, event):
+    def emecall(self):
         #打开串口，波特率115200，无校验，停止位1，数据位8，连接超时2秒
         ser = serial.Serial("/dev/ttyS0",
                             115200,
@@ -246,15 +295,30 @@ class initface():
                             timeout=2)
 
         #拨打电话
-        ser.write('ATD' + num + ';\n'.encode())
+        # ser.write('ATD' + num + ';\n'.encode())
+        ser.write('ATD18792858682;\n'.encode())
 
         #讀取返回字符串長度並打印
         serlen = ser.inWaiting()
         print(ser.read(serlen))
+        
+        #ser.write('AT+CLIP=1;\n'.encode())#开启来电显示功能
+        #ser.write('ATA;\n'.encode())#接听来电
 
     def callfamily(self):
         callpage(self.master, winheight, winwidth)
 
+    #设置定时闹钟
+    def gotoclockpage(self):
+        clockpage(self.master,winheight,winwidth)
+    #观察环境参数
+    def gotoenvpage(self):
+        #打开串口，波特率9600，无校验，停止位1，数据位8，连接超时2秒
+        ser=serial.Serial("/dev/ttyUSB0", 9600, parity='N', stopbits=1, bytesize=8, timeout=5)
+        while(1):
+            print(ser.read(32).hex())#每隔两秒读取一次数据
+            time.sleep(2)
+        #envpage(self.master,winheight,winwidth)
     def showtitle(self,threadname,x):
         def video_loop():
             try:
@@ -419,7 +483,7 @@ class littleface():
         self.master = master
         self.facepage = tk.Canvas(self.master,bg='white',width=winwidth,height=winheight,highlightthickness=0)
         self.facepage.place(x=0,y=0)
-        self.littlewidth = 600
+        self.littlewidth = 340
         self.littleheight = self.littlewidth*winheight/winwidth
         self.smile0 = ImageTk.PhotoImage(
             Image.open("srcimage/smile0.jpg").resize(
@@ -462,8 +526,9 @@ class littleface():
         self.small = False
         self.emojiid = 0
         _thread.start_new_thread(self.playface,("threadname",1))
-        self.btn = tk.Button(self.facepage,bitmap="error",height=30,width=30,command=self.changeemoji)
-        self.btn.place(x=0,y=0)
+        # self.btn = tk.Button(self.facepage,bitmap="error",height=30,width=30,command=self.changeemoji)
+        # self.btn.place(x=0,y=0)
+        self.changeemoji()
     def playface(self,treadname,x):
         while True:
             self.smileface()
@@ -507,7 +572,7 @@ class littleface():
             else:
                 time.sleep(0.1)
             if flag == 1 and plus:
-                time.sleep(1.5)          
+                time.sleep(3)          
     def happyface(self):
         self.facepage.create_image(0,0,anchor='nw',image=self.happy)
         time.sleep(2)
@@ -518,7 +583,7 @@ class littleface():
         self.smiling = True
     def changeemoji(self,x=1):
         self.facepage.config(width = self.littlewidth,height=self.littleheight)
-        self.facepage.place(x=(winwidth-self.littlewidth)/2,y=(winheight-self.littleheight)/2)
+        self.facepage.place(x=(winwidth-self.littlewidth)/2,y=(winheight-self.littleheight)/2+15)
         self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
         self.small = True
         # self.emojiid = x
