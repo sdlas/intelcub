@@ -22,6 +22,7 @@ from heartpage import heartpage #心率测量
 from clockpage import clockpage #定时服药
 from envpage import envpage #环境监测
 from playclockpage import playclockpage #闹钟播放
+from askingpage import askingpage #询问界面
 import sounddevice as sd
 winwidth = 0
 winheight = 0
@@ -308,8 +309,8 @@ class initface():
         #人工智障
         #_thread.start_new_thread(self.playface,("threadname",1))
         #语音控制
-        #_thread.start_new_thread(self.readtext,("treadname",1))
-        _thread.start_new_thread(self.starttest,("treadname",1))
+        _thread.start_new_thread(self.readtext,("treadname",1))
+        #_thread.start_new_thread(self.starttest,("treadname",1))
         #闹钟
         _thread.start_new_thread(self.clock,("threadname",1))
     def clock(self,threadname,p):
@@ -521,12 +522,13 @@ class initface():
             time.sleep(0.2)
     def readtext(self,treadname,x):
         while True:
-            with open('out.txt', 'r') as file_to_read:
-                while True:
-                    lines = file_to_read.readline() # 整行读取数据
-                    if not lines:
-                        break
-                    print(lines)
+            f = open("flag.txt")
+            line = f.readline()
+            while line:
+                print(line)
+                # if int(line) == 1:
+                #     askingpage(self.master,winheight,winwidth)
+                line = f.readline()
             time.sleep(1)
     def test(self):
         os.system("arecord -d %d -r 16000 -c 1 -t wav -f S16_LE record.wav" %
