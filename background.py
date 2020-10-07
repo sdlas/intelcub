@@ -17,6 +17,7 @@ class background():
         self.backimg = ImageTk.PhotoImage(Image.open("srcimage/background.jpg").resize((int(self.winwidth),int(self.winheight)))) 
         self.backgroundcanvas = tk.Canvas(self.master,width = self.winwidth,height = self.winheight)
         self.backgroundcanvas.place(x=0,y=0)
+        self.backgroundcanvas.create_image(0,0,anchor='nw',image=self.backimg)
     def showimage(self):
         def video_loop():
             try:

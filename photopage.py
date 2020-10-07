@@ -3,7 +3,6 @@ import tkinter.colorchooser
 import pygame as py
 import time
 import _thread
-from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 import multiprocessing
@@ -46,7 +45,7 @@ class photopage():
         for n in range(0,len(self.imagelist)):
             locals()['self.tempbutton'+str(n)] = tk.Button(self.photopage,image=self.imagereadlist[n], width=self.photowidth,height=self.photowidth,command=self.returnfun(n),bd=0)
             locals()['self.tempbutton'+str(n)].place(x=n%7*(self.photowidth+self.photopadding)+self.photopadding,y=int((n+1)/8)*(self.photowidth+self.photopadding)+self.topheight)
-        bg.showimage()
+        #bg.showimage()
     def back(self):
         self.photopage.destroy()
         #self.vbar.destory()

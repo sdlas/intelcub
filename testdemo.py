@@ -119,6 +119,8 @@ class initface():
             ]
         ]
         self.child = []
+        # for item in self.child:
+        #     item
         #读取图片
         self.titleimage = ImageTk.PhotoImage(
             Image.open("srcimage/title.jpg").resize(
@@ -307,7 +309,7 @@ class initface():
         _thread.start_new_thread(self.playface,("threadname",1))
         #语音控制
         #_thread.start_new_thread(self.readtext,("treadname",1))
-        _thread.start_new_thread(self.starttest,("treadname",1))
+        #_thread.start_new_thread(self.starttest,("treadname",1))
         #闹钟
         _thread.start_new_thread(self.clock,("threadname",1))
     def clock(self,threadname,p):
@@ -317,7 +319,7 @@ class initface():
                 #开始打铃
                 self.playclocking = True
                 playclockpage(self.master,winheight,winwidth)
-            time.sleep(1)
+            time.sleep(30)
     def readclock(self):
         #闹钟内容读取
         self.f = open("doc/clockplan.txt")
@@ -386,13 +388,10 @@ class initface():
             temp.append(int(item))
         return temp
     def gotovideo(self):
-        #self.initface.destroy()
         self.child.append(videopage(self.master, winheight, winwidth))
 
-    def gotophoto(self,threadname = "threadname",x=1):
-        #self.initface.destroy()
+    def gotophoto(self):
         self.child.append(photopage(self.master, winheight, winwidth))
-        print("self.child===============================",len(self.child))
 
     def gotomusic(self):
         self.child.append(musicpage(self.master, winheight, winwidth))
@@ -521,7 +520,7 @@ class initface():
         res = res['result'][0]
         print(res)
         if "照片" in res:
-            _thread.start_new_thread(self.gotophoto,("threadname",1))
+            self.gotophoto()
             return
         if "视频" in res:
             self.gotovideo()
