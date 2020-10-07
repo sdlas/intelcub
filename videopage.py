@@ -7,7 +7,6 @@ import time
 import _thread
 import threading
 from threading import Thread
-from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 import multiprocessing
@@ -111,6 +110,10 @@ class videopage():
         self.vc1.release()
         cv2.destroyAllWindows()
     def back(self):
+        try:
+            pygame.quit()
+        except:
+            pass
         self.videocanvas.destroy()
     def showpygletvideo(self,name):
         pygame.init()

@@ -95,6 +95,10 @@ class musicpage():
                                        y=self.pausebtnmovey)
         bg.showimage()
     def back(self):
+        try:
+            py.mixer.music.stop()
+        except:
+            pass
         self.musicpage.destroy()
         #self.vbar.destory()
 
@@ -154,12 +158,4 @@ class musicpage():
         for item in array:
             arrayr.append(item)
         return arrayr
-
-if __name__ == '__main__':
-    root = tk.Tk()
-    root.attributes("-fullscreen", True)
-    winwidth = root.winfo_screenwidth()
-    winheight = root.winfo_screenheight()
-    photopage(root, winheight, winwidth)
-    root.mainloop()
     

@@ -31,7 +31,7 @@ secret_key = "7wDCfXsZ8blwwa2peLOwVOHIoZuOyHUm"
 
 client = AipSpeech(app_id, api_key, secret_key)
 length = 2
-duration = 50  # seconds
+duration = 10000  # seconds
 #今天会闹钟的时间
 clocktime = []
 #桌面
@@ -306,10 +306,10 @@ class initface():
         self.readclock()
         #刷新显示图片
         #人工智障
-        _thread.start_new_thread(self.playface,("threadname",1))
+        #_thread.start_new_thread(self.playface,("threadname",1))
         #语音控制
         #_thread.start_new_thread(self.readtext,("treadname",1))
-        #_thread.start_new_thread(self.starttest,("treadname",1))
+        _thread.start_new_thread(self.starttest,("treadname",1))
         #闹钟
         _thread.start_new_thread(self.clock,("threadname",1))
     def clock(self,threadname,p):
@@ -388,17 +388,27 @@ class initface():
             temp.append(int(item))
         return temp
     def gotovideo(self):
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
         self.child.append(videopage(self.master, winheight, winwidth))
 
     def gotophoto(self):
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
         self.child.append(photopage(self.master, winheight, winwidth))
 
     def gotomusic(self):
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
         self.child.append(musicpage(self.master, winheight, winwidth))
-    def gotohearto2(self):
-        self.hearto2page.append(hearto2page(self,self.master,winheight,winwidth))
     #心率
     def gotoheartpage(self):
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
         self.child.append(heartpage(self,self.master, winheight, winwidth))
     #紧急呼救
     def emecall(self):
@@ -422,14 +432,22 @@ class initface():
         #ser.write('ATA;\n'.encode())#接听来电
 
     def callfamily(self):
-        callpage(self.master, winheight, winwidth)
+        if len(self.child)>0:
+            self.child = []
+        self.child.append(callpage(self.master, winheight, winwidth))
 
     #设置定时闹钟
     def gotoclockpage(self):
-        clockpage(self,self.master,winheight,winwidth)
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
+        self.child.append(clockpage(self,self.master,winheight,winwidth))
     #观察环境参数
     def gotoenvpage(self):
-        envpage(self.master,winheight,winwidth)
+        if len(self.child)>0:
+            self.child[0].back()
+            self.child = []
+        self.child.append(envpage(self.master,winheight,winwidth))
     #测血压
     def bloodpressuretest(self,callclass,theadname,name):
         #打开串口，波特率9600，无校验，停止位1，数据位8，连接超时2秒
@@ -534,8 +552,20 @@ class initface():
         if "电话" in res:
             self.callfamily()
             return
-        if "退出" in res:
-            self.child[0].back()
+        if "环境" in res:
+            self.gotoenvpage()
+            return
+        if "救命" in res:
+            self.emecall()
+            return
+        if "闹钟" in res:
+            self.gotoclockpage()
+            return
+        if "菜单" in res or "退出" in res:
+            if len(self.child)>0:
+                self.child[0].back()
+                self.child = []
+            return  
     def print_sound(self,indata, outdata, frames, time, status):
         volume_norm = np.linalg.norm(indata)*10
         if int(volume_norm)>100:

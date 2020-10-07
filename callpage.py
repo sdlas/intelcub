@@ -52,7 +52,7 @@ class callpage():
         tempimage = tempimage.resize((int(self.avatarwidth),int(self.avatarwidth/imgscale)))
         return tempimage
     def back(self):
-        pass
+        self.callpage.destroy()
     def call(self):
         callnumber(self.master,self.winheight,self.winwidth)
 class callnumber():

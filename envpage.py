@@ -103,3 +103,5 @@ class envpage():
             return 15
         else:
             return int(string)
+    def back(self):
+        self.envpage.destroy()

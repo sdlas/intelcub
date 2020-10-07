@@ -19,13 +19,14 @@ class background():
         self.backgroundcanvas.place(x=0,y=0)
         self.backgroundcanvas.create_image(0,0,anchor='nw',image=self.backimg)
     def showimage(self):
-        def video_loop():
-            try:
-                while True:
-                    self.backgroundcanvas.create_image(0,0,anchor='nw',image=self.backimg)  
-                    #canvas4.create_image(0,0,anchor='nw',image=picture1) 
-                    self.backgroundcanvas.update_idletasks()  #最重要的更新是靠这两句来实现
-                    self.backgroundcanvas.update()
-            except:
-                self.master.destroy()
-        video_loop()
+        # def video_loop():
+        #     try:
+        #         while True:
+        #             self.backgroundcanvas.create_image(0,0,anchor='nw',image=self.backimg)  
+        #             #canvas4.create_image(0,0,anchor='nw',image=picture1) 
+        #             self.backgroundcanvas.update_idletasks()  #最重要的更新是靠这两句来实现
+        #             self.backgroundcanvas.update()
+        #     except:
+        #         self.master.destroy()
+        # video_loop()
+        pass

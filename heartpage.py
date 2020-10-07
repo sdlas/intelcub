@@ -105,6 +105,8 @@ class heartpage():
     def seehistory(self):
         if not self.working:
             history(self.heartpage,self.winheight,self.winwidth)
+    def back(self):
+        self.heartpage.destroy()
 class result():
     def __init__(self,master,_winheight,_winwidth,resultlist):
         self.winheight = _winheight

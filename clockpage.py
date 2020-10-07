@@ -145,6 +145,8 @@ class clockpage():
         for item in lists:
             temp.append(int(item))
         return temp
+    def back(self):
+        self.clockpage.destroy()
 class editclock():
     def __init__(self,mainclass,master,_winheight,_winwidth,id,message):
         self.winheight = _winheight
