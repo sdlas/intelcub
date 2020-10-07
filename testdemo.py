@@ -12,6 +12,7 @@ import cv2
 from PIL import Image, ImageTk
 import multiprocessing
 import math
+from datetime import datetime
 from videopage import videopage  #视频播放界面
 from photopage import photopage  #相册界面
 from musicpage import musicpage  #音乐界面
@@ -20,6 +21,7 @@ from hearto2page import hearto2page #血氧浓度检测
 from heartpage import heartpage #心率测量
 from clockpage import clockpage #定时服药
 from envpage import envpage #环境监测
+from playclockpage import playclockpage #闹钟播放
 import sounddevice as sd
 winwidth = 0
 winheight = 0
@@ -30,7 +32,8 @@ secret_key = "7wDCfXsZ8blwwa2peLOwVOHIoZuOyHUm"
 client = AipSpeech(app_id, api_key, secret_key)
 length = 2
 duration = 50  # seconds
-
+#今天会闹钟的时间
+clocktime = []
 #桌面
 class basedesk():
     def __init__(self, master):
@@ -39,7 +42,7 @@ class basedesk():
         self.root.title('Base page')
         self.root.geometry(str(winwidth) + 'x' + str(winheight))
         initface(self.root)
-        littleface(self.root)
+        #littleface(self.root)
 
 
 #初始界面
@@ -68,6 +71,14 @@ class initface():
         self.heartratelist = [80,90,69,110,102,79] #心跳速度列表
         self.oxygenlist = [89,90,98,96,87,92] #血氧浓度列表
         self.twomove = 100
+        self.playclockwidth = winwidth
+        self.playclockheight = winheight
+        self.littlewidth = 340
+        self.littleheight = self.littlewidth*winheight/winwidth
+        self.smiling = True
+        self.small = False
+        self.emojiid = 0
+        self.playclocking = False
         #偏移量
         self.move = [
             [
@@ -167,6 +178,28 @@ class initface():
         self.closeimage = ImageTk.PhotoImage(
             Image.open("srcimage/close.jpg").resize(
                 (int(self.closebtnwidth), int(self.closebtnwidth))))
+        self.playclockimage = ImageTk.PhotoImage(
+            Image.open("srcimage/playclock.jpg").resize(
+                (int(self.playclockwidth), int(self.playclockheight))))
+        
+        self.lsmile0 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile0.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile1 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile1.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile2 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile2.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lsmile3 = ImageTk.PhotoImage(
+            Image.open("srcimage/smile3.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.lhappy = ImageTk.PhotoImage(
+            Image.open("srcimage/happy.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
+        self.ldislike = ImageTk.PhotoImage(
+            Image.open("srcimage/dislike.jpg").resize(
+                (int(self.littlewidth), int(self.littleheight))))
         # 右边的三个按钮
         self.buttonA_1 = tk.Button(self.initface,
                                    image=self.bookimage,
@@ -261,13 +294,96 @@ class initface():
                                   bd=0,
                                   command=self.destroypage)
         self.closebtn.place(x=winwidth - self.closebtnwidth, y=0)
+        self.facepage = tk.Canvas(self.master,width = self.littlewidth,height=self.littleheight,highlightthickness=0)
+        self.facepage.place(x=(winwidth-self.littlewidth)/2,y=(winheight-self.littleheight)/2+15)
+        self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
+        self.playclock = tk.Canvas(self.initface,width=self.playclockwidth,height=self.playclockheight)
+        self.playclock.create_image(0,0,anchor="nw",image=self.playclockimage)
         self.hearto2page = [] 
+        self.tasklist = []
+        self.readclock()
         #刷新显示图片
-        _thread.start_new_thread(self.showtitle,("threadname",1))
+        #人工智障
+        _thread.start_new_thread(self.playface,("threadname",1))
         #_thread.start_new_thread(self.readtext,("treadname",1))
-        _thread.start_new_thread(self.starttest,("treadname",1))
-        
-
+        #_thread.start_new_thread(self.starttest,("treadname",1))
+        #闹钟
+        _thread.start_new_thread(self.clock,("threadname",1))
+    def clock(self,threadname,p):
+        while True:
+            time_now=[time.localtime(time.time()).tm_hour,time.localtime(time.time()).tm_min]
+            if time_now in clocktime:
+                #开始打铃
+                self.playclocking = True
+                playclockpage(self.master,winheight,winwidth)
+            time.sleep(1)
+    def readclock(self):
+        #闹钟内容读取
+        self.f = open("doc/clockplan.txt")
+        line = self.f.readline()
+        while line:
+            if int(line) != 0:
+                templist = []
+                line = self.f.readline().replace("\n", "")
+                line = list(line.split(","))
+                line = self.transint(line)
+                templist.append(line)
+                line = self.f.readline().replace("\n", "")
+                if int(line) == 0:
+                    line = False
+                else:
+                    line = True
+                templist.append(line)
+                line = self.f.readline().replace("\n","")
+                line = list(line.split(","))
+                line = self.transint(line)
+                templist.append(line)
+                self.tasklist.append(templist)
+                line = self.f.readline()
+            else:
+                self.tasklist.append([int(line)])
+                line = self.f.readline()
+        self.f.close()
+        self.pushinclock()
+    #转换成今日要闹钟的时间
+    def pushinclock(self):
+        for i in range(0,len(self.tasklist)):
+            templist = self.tasklist[i]
+            if templist[0]!=0:
+                day_Week = datetime.now().weekday()
+                if day_Week in templist[2]:
+                    if templist[0] not in clocktime:
+                        clocktime.append(templist[0])
+        self.writeclock()
+    # 将时钟写入文件
+    def writeclock(self):
+        with open('doc/clockplan.txt','w') as file_handle:   # .txt可以不自己新建,代码会自动新建
+            for i in range(0,len(self.tasklist)):
+                templist = self.tasklist[i]
+                if templist[0]!=0:
+                    file_handle.write("1")     # 写入
+                    file_handle.write('\n')         # 有时放在循环里面需要自动转行，不然会覆盖上一条数据
+                    file_handle.write(str(templist[0][0])+","+str(templist[0][1]))
+                    file_handle.write('\n')
+                    if templist[1]:
+                        file_handle.write("1")
+                    else:
+                        file_handle.write("0")
+                    file_handle.write("\n")
+                    string = ""
+                    for item in templist[2]:
+                        string = string+ str(item)+","
+                    string = string[:-1]
+                    file_handle.write(string)
+                    file_handle.write("\n")
+                else:
+                    file_handle.write("0")
+                    file_handle.write("\n")
+    def transint(self,lists):
+        temp = []
+        for item in lists:
+            temp.append(int(item))
+        return temp
     def gotovideo(self):
         #self.initface.destroy()
         self.child.append(videopage(self.master, winheight, winwidth))
@@ -310,35 +426,10 @@ class initface():
 
     #设置定时闹钟
     def gotoclockpage(self):
-        clockpage(self.master,winheight,winwidth)
+        clockpage(self,self.master,winheight,winwidth)
     #观察环境参数
     def gotoenvpage(self):
-        #打开串口，波特率9600，无校验，停止位1，数据位8，连接超时2秒
-        ser=serial.Serial("/dev/ttyUSB0", 9600, parity='N', stopbits=1, bytesize=8, timeout=5)
-        while(1):
-            print(ser.read(32).hex())#每隔两秒读取一次数据
-            time.sleep(2)
-        #envpage(self.master,winheight,winwidth)
-    def showtitle(self,threadname,x):
-        def video_loop():
-            try:
-                while True:
-                    # self.initface.create_image(0,
-                    #                            0,
-                    #                            anchor='nw',
-                    #                            image=self.backgroundimage)
-                    self.titleCanvas.create_image(0,
-                                                  0,
-                                                  anchor='nw',
-                                                  image=self.titleimage)
-
-                    self.master.update_idletasks()  #最重要的更新是靠这两句来实现
-                    self.master.update()
-            except:
-                pass
-
-        video_loop()
-        #self.face1.mainloop()
+        envpage(self.master,winheight,winwidth)
     #测血压
     def bloodpressuretest(self,callclass,theadname,name):
         #打开串口，波特率9600，无校验，停止位1，数据位8，连接超时2秒
@@ -478,57 +569,6 @@ class initface():
     def starttest(self,threadname,x):
         with sd.Stream(callback=self.print_sound):
             sd.sleep(duration * 1000)
-class littleface():
-    def __init__(self,master):
-        self.master = master
-        self.facepage = tk.Canvas(self.master,bg='white',width=winwidth,height=winheight,highlightthickness=0)
-        self.facepage.place(x=0,y=0)
-        self.littlewidth = 340
-        self.littleheight = self.littlewidth*winheight/winwidth
-        self.smile0 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile0.jpg").resize(
-                (int(winwidth), int(winheight))))
-        self.smile1 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile1.jpg").resize(
-                (int(winwidth), int(winheight))))
-        self.smile2 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile2.jpg").resize(
-                (int(winwidth), int(winheight))))
-        self.smile3 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile3.jpg").resize(
-                (int(winwidth), int(winheight))))
-        self.happy = ImageTk.PhotoImage(
-            Image.open("srcimage/happy.jpg").resize(
-                (int(winwidth), int(winheight))))
-        self.dislike = ImageTk.PhotoImage(
-            Image.open("srcimage/dislike.jpg").resize(
-                (int(winwidth), int(winheight))))
-
-        self.lsmile0 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile0.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.lsmile1 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile1.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.lsmile2 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile2.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.lsmile3 = ImageTk.PhotoImage(
-            Image.open("srcimage/smile3.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.lhappy = ImageTk.PhotoImage(
-            Image.open("srcimage/happy.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.ldislike = ImageTk.PhotoImage(
-            Image.open("srcimage/dislike.jpg").resize(
-                (int(self.littlewidth), int(self.littleheight))))
-        self.smiling = True
-        self.small = False
-        self.emojiid = 0
-        _thread.start_new_thread(self.playface,("threadname",1))
-        # self.btn = tk.Button(self.facepage,bitmap="error",height=30,width=30,command=self.changeemoji)
-        # self.btn.place(x=0,y=0)
-        self.changeemoji()
     def playface(self,treadname,x):
         while True:
             self.smileface()
@@ -540,25 +580,14 @@ class littleface():
         flag = 0
         plus = True
         while self.smiling:
-            if self.small:
-                if flag ==0:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
-                if flag ==1:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile1)
-                if flag ==2:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile2)
-                if flag ==3:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.lsmile3)
-            else:
-                if flag ==0:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.smile0)
-                if flag ==1:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.smile1)
-                if flag ==2:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.smile2)
-                if flag ==3:
-                    self.facepage.create_image(0,0,anchor='nw',image=self.smile3)
-                
+            if flag ==0:
+                self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
+            if flag ==1:
+                self.facepage.create_image(0,0,anchor='nw',image=self.lsmile1)
+            if flag ==2:
+                self.facepage.create_image(0,0,anchor='nw',image=self.lsmile2)
+            if flag ==3:
+                self.facepage.create_image(0,0,anchor='nw',image=self.lsmile3)
             if plus:
                 flag = flag + 1
             else:
@@ -581,13 +610,6 @@ class littleface():
         self.facepage.create_image(0,0,anchor='nw',image=self.dislike)
         time.sleep(2)
         self.smiling = True
-    def changeemoji(self,x=1):
-        self.facepage.config(width = self.littlewidth,height=self.littleheight)
-        self.facepage.place(x=(winwidth-self.littlewidth)/2,y=(winheight-self.littleheight)/2+15)
-        self.facepage.create_image(0,0,anchor='nw',image=self.lsmile0)
-        self.small = True
-        # self.emojiid = x
-        # self.smiling = False
 def start(threadname,x):
     os.system("./hello.sh")
 if __name__ == '__main__':

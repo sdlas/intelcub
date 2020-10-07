@@ -91,6 +91,9 @@ class callnumber():
         self.btnvalue = [1,2,3,4,5,6,7,8,9,0,11,10]
         self.imagenamelist =["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","0.jpg","del.jpg","call.jpg"]
         self.imagelist = []
+        self.offphoneimg = ImageTk.PhotoImage(
+            Image.open("srcimage/offphone.jpg").resize(
+                (int(self.numberbtnwidth), int(self.numberbtnheight))))
         for i in range(0,len(self.imagenamelist)):
             self.imagelist.append(
                 ImageTk.PhotoImage(
@@ -129,6 +132,7 @@ class callnumber():
         # ser.write('ATD' + num + ';\n'.encode())
         string = 'ATD'+str(self.number)+';\n'
         self.calling = True
+        self.btnlist[-1].config(image=self.offphoneimg)
         ser.write(string.encode())
 
         #讀取返回字符串長度並打印
@@ -139,6 +143,7 @@ class callnumber():
         #ser.write('ATA;\n'.encode())#接听来电
     def offphone(self):
         self.calling = False
+        self.btnlist[-1].config(image=self.imagelist[-1])
         ser = serial.Serial("/dev/ttyS0",
                             115200,
                             parity='N',

@@ -12,13 +12,14 @@ from backbtn import backbtn
 from title import title
 from background import background
 class clockpage():
-    def __init__(self,matser,_winheight,_winwidth):
+    def __init__(self,mainclass,matser,_winheight,_winwidth):
         self.winheight = _winheight
         self.winwidth = _winwidth
         self.master = matser
+        self.mainclass = mainclass
         self.clockpage = tk.Frame(self.master,bg="pink",height = self.winheight ,width =self.winwidth)
         self.clockpage.place(x=0,y=0)
-        self.tasklist = []
+        self.mainclass.tasklist = []
         self.f = open("doc/clockplan.txt")
         line = self.f.readline()
         while line:
@@ -38,13 +39,13 @@ class clockpage():
                 line = list(line.split(","))
                 line = self.transint(line)
                 templist.append(line)
-                self.tasklist.append(templist)
+                self.mainclass.tasklist.append(templist)
                 line = self.f.readline()
             else:
-                self.tasklist.append([int(line)])
+                self.mainclass.tasklist.append([int(line)])
                 line = self.f.readline()
         self.f.close()
-        self.taskstrlist = self.translist(self.tasklist)
+        self.taskstrlist = self.translist(self.mainclass.tasklist)
         self.topheight = 130 #顶部标题高度
         self.ypadding = 10
         self.xpadding = 20
@@ -83,9 +84,9 @@ class clockpage():
     def returndetfun(self,i):
         return lambda:self.detting(i)
     def setting(self,x):
-        editclock(self,self.clockpage,self.winheight,self.winwidth,x,self.tasklist[x])
+        editclock(self,self.clockpage,self.winheight,self.winwidth,x,self.mainclass.tasklist[x])
     def detting(self,x):
-        self.tasklist[x]=[0]
+        self.mainclass.tasklist[x]=[0]
         self.refresh()
     def translist(self,l):
         resultlist = []
@@ -115,19 +116,19 @@ class clockpage():
             resultlist.append(tempstr)
         return resultlist
     def setlist(self,x,message):
-        self.tasklist[x] = message
+        self.mainclass.tasklist[x] = message
         self.refresh()
     def refresh(self):
-        self.taskstrlist = self.translist(self.tasklist)
+        self.taskstrlist = self.translist(self.mainclass.tasklist)
         for i in range(0,len(self.canvaslist)):
             self.canvaslist[i].destroy()
         self.btnlist = []
         self.detelebtnlist = []
         self.canvaslist = []
-        for i in range(0,len(self.tasklist)):
+        for i in range(0,len(self.mainclass.tasklist)):
             self.canvaslist.append(tk.Canvas(self.clockpage,width=self.taskwidth,height=self.taskheight,highlightthickness=0))
             self.canvaslist[i].place(x=self.xpadding*((i%2)*2+1) +(i%2)*self.taskwidth,y=self.topheight+self.taskheight*int(i/2)+self.ypadding*((int(i/2))*2+1))
-            if self.tasklist[i][0] != 0:
+            if self.mainclass.tasklist[i][0] != 0:
                 self.canvaslist[i].create_text(self.taskwidth/2,self.taskheight/2,text=self.taskstrlist[i],font=("宋体",30))
                 self.btnlist.append(tk.Button(self.canvaslist[i],image=self.editimage,width=self.btnwidth,height=self.btnheight,command=self.returnfun(i)))
                 self.detelebtnlist.append(tk.Button(self.canvaslist[i],image=self.closeimage,width=self.btnwidth,height=self.btnheight,command=self.returndetfun(i)))
@@ -339,4 +340,5 @@ class editclock():
         resultlist.append(repflag)
         resultlist.append(daylist)
         self.mainclass.setlist(self.id,resultlist)
+        self.mainclass.mainclass.pushinclock()
         self.editpage.destroy()

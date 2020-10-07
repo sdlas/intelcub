@@ -3,17 +3,17 @@ import tkinter.colorchooser
 import pygame as py
 import time
 import _thread
-from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 import multiprocessing
 import glob
 
 class background():
-    def __init__(self,master,_winheight,_winwidth,str):
+    def __init__(self,master,_winheight,_winwidth,string):
         self.winheight = _winheight
         self.winwidth = _winwidth
         self.master =master
+        self.string = string
         self.backimg = ImageTk.PhotoImage(Image.open("srcimage/background.jpg").resize((int(self.winwidth),int(self.winheight)))) 
         self.backgroundcanvas = tk.Canvas(self.master,width = self.winwidth,height = self.winheight)
         self.backgroundcanvas.place(x=0,y=0)
@@ -27,5 +27,4 @@ class background():
                     self.backgroundcanvas.update()
             except:
                 self.master.destroy()
-            
         video_loop()

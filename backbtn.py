@@ -3,7 +3,6 @@ import tkinter.colorchooser
 import pygame as py
 import time
 import _thread
-from tkinter import *
 import cv2
 from PIL import Image, ImageTk
 import multiprocessing
@@ -22,4 +21,8 @@ class backbtn():
         self.backbtn = tk.Button(self.master,image = self.backimg,height=self.backbtnheight,width=self.backbtnwidth,command=self.back)
         self.backbtn.place(x=self.backbtnpadding,y=self.backbtnpadding) 
     def back(self):
+        try:
+            py.mixer.music.stop()
+        except:
+            pass
         self.master.destroy()
