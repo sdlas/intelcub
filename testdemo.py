@@ -305,8 +305,9 @@ class initface():
         #刷新显示图片
         #人工智障
         _thread.start_new_thread(self.playface,("threadname",1))
+        #语音控制
         #_thread.start_new_thread(self.readtext,("treadname",1))
-        #_thread.start_new_thread(self.starttest,("treadname",1))
+        _thread.start_new_thread(self.starttest,("treadname",1))
         #闹钟
         _thread.start_new_thread(self.clock,("threadname",1))
     def clock(self,threadname,p):
@@ -455,31 +456,6 @@ class initface():
     #关闭当前界面
     def destroypage(self):
         self.master.destroy()
-    #开启多线程
-    def startnewthread(self):
-        _thread.start_new_thread(self.printnum,("threadname",1))
-        _thread.start_new_thread(self.drawline,("threadname2",1))
-    #读取数据，刷新显示
-    def printnum(self,str,x):
-        while(1):
-            #獲取字符串長度
-            serlen = ser.inWaiting()
-            #打印字符串
-            string = bytes.decode(ser.read(serlen))
-            arr = self.resolvestr(string)
-            if arr[0]!=-1:
-                self.heartratelist.append(arr[0])
-                self.oxygenlist.append(arr[1])
-            else:
-                if len(self.heartratelist)>0:
-                    self.heartratelist.append(self.heartratelist[-1])
-                    self.oxygenlist.append(self.oxygenlist[-1])
-            #程序延時1s
-            time.sleep(1)
-    def drawline(self,str,x):
-        while(1):
-            self.hearto2page[0].drawline()
-            time.sleep(1)
     #将字符串处理成可用数据
     def resolvestr(self,_str):
         array = _str.split(',')
@@ -603,11 +579,11 @@ class initface():
             if flag == 1 and plus:
                 time.sleep(3)          
     def happyface(self):
-        self.facepage.create_image(0,0,anchor='nw',image=self.happy)
+        #self.facepage.create_image(0,0,anchor='nw',image=self.happy)
         time.sleep(2)
         self.smiling = True
     def dislikeface(self):
-        self.facepage.create_image(0,0,anchor='nw',image=self.dislike)
+        #self.facepage.create_image(0,0,anchor='nw',image=self.dislike)
         time.sleep(2)
         self.smiling = True
 def start(threadname,x):

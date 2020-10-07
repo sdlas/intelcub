@@ -88,6 +88,7 @@ class clockpage():
     def detting(self,x):
         self.mainclass.tasklist[x]=[0]
         self.refresh()
+        self.mainclass.pushinclock()
     def translist(self,l):
         resultlist = []
         for i in range(0,len(l)):
