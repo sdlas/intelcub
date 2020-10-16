@@ -13,8 +13,9 @@ from background import background
 winheight = 0
 winwidth = 0
 class photopage():
-    def __init__(self,master,_winheight,_winwidth):
+    def __init__(self,mainclass,master,_winheight,_winwidth):
         #获取本地图片文件
+        self.mainclass = mainclass
         self.extensionlist = ['jpg']
         self.imagelist = []
         for extension in self.extensionlist: 
@@ -38,15 +39,16 @@ class photopage():
          #背景
         bg = background(self.photopage,self.winheight,self.winwidth,"call")
         #返回按钮
-        backbtn(self.photopage,self.winheight,self.winwidth)
+        backbtn(self.mainclass,self.photopage,self.winheight,self.winwidth,0)
         #标题
         title(self.photopage,self.winheight,self.winwidth,"看照片")
         #图片缩略图放置
         for n in range(0,len(self.imagelist)):
             locals()['self.tempbutton'+str(n)] = tk.Button(self.photopage,image=self.imagereadlist[n], width=self.photowidth,height=self.photowidth,command=self.returnfun(n),bd=0)
-            locals()['self.tempbutton'+str(n)].place(x=n%7*(self.photowidth+self.photopadding)+self.photopadding,y=int((n+1)/8)*(self.photowidth+self.photopadding)+self.topheight)
+            locals()['self.tempbutton'+str(n)].place(x=n%7*(self.photowidth+self.photopadding)+self.photopadding,y=int(n/7)*(self.photowidth+self.photopadding)+self.topheight)
         #bg.showimage()
     def back(self):
+        self.mainclass.curfunid = -1
         self.photopage.destroy()
         #self.vbar.destory()
     def showbigimage(self,x):
@@ -75,15 +77,15 @@ class bigimage():
         self.bigimage = tk.Canvas(self.master,bg="pink",width=self.winwidth,height=self.winheight)
         self.bigimage.configure(highlightthickness=0)
         self.bigimage.place(x=0,y=0)
-        self.paddingl = 200 #水平的间隙
-        self.paddingv = 60 #竖直方向的间隙 
+        self.paddingl = 100 #水平的间隙
+        self.paddingv = 30 #竖直方向的间隙 
         self.canvaswidth = self.winwidth-self.paddingl*2
         self.canvasheight = self.winheight-self.paddingv*2
         self.canvasscale = self.canvaswidth/self.canvasheight
-        self.pointbtnwidth = 100 #切换图片按钮的大小
-        self.pointbtnpadding = 50 #按钮的间距
-        self.closebtnwidth = 50 #关闭按钮的大小
-        self.closebtnpadding =30 #关闭按钮的间距
+        self.pointbtnwidth = 50 #切换图片按钮的大小
+        self.pointbtnpadding = 25 #按钮的间距
+        self.closebtnwidth = 30 #关闭按钮的大小
+        self.closebtnpadding =20 #关闭按钮的间距
         self.rightimg = ImageTk.PhotoImage(Image.open("srcimage/toright.jpg").resize((int(self.pointbtnwidth),int(self.pointbtnwidth))))  
         self.leftimg = ImageTk.PhotoImage(Image.open("srcimage/toleft.jpg").resize((int(self.pointbtnwidth),int(self.pointbtnwidth))))  
         self.closeimg = ImageTk.PhotoImage(Image.open("srcimage/close.jpg").resize((int(self.closebtnwidth),int(self.closebtnwidth)))) 
@@ -128,8 +130,6 @@ class bigimage():
             
         video_loop()
         #self.face1.mainloop()
-        self.vc1.release()
-        cv2.destroyAllWindows()
     #返回合适比例的图片
     def goodimage(self,id):
         tempimage = Image.open("photos/"+self.imagelist[id])

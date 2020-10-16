@@ -9,7 +9,9 @@ import multiprocessing
 import glob
 
 class backbtn():
-    def __init__(self,master,_winheight,_winwidth):
+    def __init__(self,mainclass,master,_winheight,_winwidth,id):
+        self.mainclass = mainclass
+        self.id=id
         self.winheight = _winheight
         self.winwidth = _winwidth
         self.master =master
@@ -25,4 +27,10 @@ class backbtn():
             py.mixer.music.stop()
         except:
             pass
+        try:
+            self.mainclass.curfunid = -1
+        except:
+            pass
+        if self.id == 9:
+            self.mainclass.inhistroy = False
         self.master.destroy()

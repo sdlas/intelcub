@@ -24,15 +24,14 @@ class playclockpage():
         self.playclockpage.place(x=0,y=0)
         #背景
         bg = background(self.playclockpage,self.winheight,self.winwidth,"clock")
-        #返回按钮
-        backbtn(self.playclockpage,self.winheight,self.winwidth)
         #标题
+        backbtn(self,self.playclockpage,self.winheight,self.winwidth,13)
         bg.backgroundcanvas.create_image(0,0,anchor="nw",image=self.clockimg)
         self.combtn = tk.Button(self.playclockpage,image=self.confirmimg,width=self.comwidth,height=self.comheight,command=self.back)
         self.combtn.place(x=(self.winwidth-self.comwidth)/2,y=750)
         self.playmusic()
     def playmusic(self):
-        filepath = "record.wav"
+        filepath = "methon.mp3"
         py.mixer.init()
         # 加载音乐
         py.mixer.music.load(filepath)

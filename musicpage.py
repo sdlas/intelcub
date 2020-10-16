@@ -17,9 +17,10 @@ winwidth = 0
 
 
 class musicpage():
-    def __init__(self, master, _winheight, _winwidth):
+    def __init__(self, mainclass,master, _winheight, _winwidth):
 
         #获取本地音乐文件
+        self.mainclass = mainclass
         self.extensionlist = ['mp3', 'flac']
         self.musiclist = []
         for extension in self.extensionlist:
@@ -31,9 +32,9 @@ class musicpage():
         self.winheight = _winheight
         self.winwidth = _winwidth
         self.photopadding = self.winwidth / 128
-        self.photoleftpadding = 500
+        self.photoleftpadding = 300
         self.photowidth = self.winwidth - self.photopadding * 2 - self.photoleftpadding
-        self.photoheight = 70
+        self.photoheight = 40
         self.photomovex = (self.winwidth - self.photowidth) / 2
         self.master = master
         self.musicreadlist = []
@@ -41,7 +42,7 @@ class musicpage():
         self.backbtnheight = self.topheight / 2
         self.backbtnwidth = self.backbtnheight
         self.backbtnpadding = self.topheight / 4  #顶部按钮的间距
-        self.pausebtnwidth = 40
+        self.pausebtnwidth = 30
         self.pausebtnmovey = (self.photoheight - self.pausebtnwidth) / 2
         self.pausebtnmovex = self.photowidth - 30 - self.pausebtnwidth
         self.curid = -1
@@ -66,7 +67,7 @@ class musicpage():
          #背景
         bg = background(self.musicpage,self.winheight,self.winwidth,"call")
         #返回按钮
-        backbtn(self.musicpage,self.winheight,self.winwidth)
+        backbtn(self.mainclass,self.musicpage,self.winheight,self.winwidth,1)
         #标题
         title(self.musicpage,self.winheight,self.winwidth,"播放音乐")
         self.Canvaslist = []
@@ -84,7 +85,7 @@ class musicpage():
             self.Canvaslist[n].create_text(self.photowidth / 2,
                                            self.photoheight / 2,
                                            text=self.resolvestr(self.musiclist[n])[0],
-                                           font=("黑体", 25))
+                                           font=("黑体", 15))
             self.pausebtnlist.append(
                 tk.Button(self.Canvaslist[n],
                           image=self.playimg,
@@ -99,6 +100,7 @@ class musicpage():
             py.mixer.music.stop()
         except:
             pass
+        self.mainclass.curfunid = -1
         self.musicpage.destroy()
         #self.vbar.destory()
 
@@ -158,4 +160,18 @@ class musicpage():
         for item in array:
             arrayr.append(item)
         return arrayr
+    def autoplay(self,):
+        #切换歌曲要恢复设置
+        self.choosemusic(0)
+    def formsong(self,):
+        tempid = (self.curid - 1)%len(self.musiclist)
+        print("change!!!!!!!!!!")
+        if tempid>-1:
+            self.choosemusic(tempid)
+    def nextsong(self):
+        print("changfeedadaedwe")
+        tempid = (self.curid + 1)%len(self.musiclist)
+        if tempid>-1:
+            self.choosemusic(tempid)
+
     

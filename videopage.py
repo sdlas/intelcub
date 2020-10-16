@@ -27,7 +27,8 @@ imagepos_y=0
 butpos_x=450
 butpos_y=450
 class videopage():
-    def __init__(self,master,_winheight,_winwidth):
+    def __init__(self,mainclass,master,_winheight,_winwidth):
+        self.mainclass = mainclass
         self.extensionlist = ['mp4']
         self.videolist = []
         for extension in self.extensionlist:
@@ -53,7 +54,7 @@ class videopage():
         #背景
         bg = background(self.videocanvas,self.winheight,self.winwidth,"call")
         #返回按钮
-        backbtn(self.videocanvas,self.winheight,self.winwidth)
+        backbtn(self.mainclass,self.videocanvas,self.winheight,self.winwidth,2)
         #标题
         title(self.videocanvas,self.winheight,self.winwidth,"播放视频")
         # 视频缩略图放置
@@ -114,6 +115,7 @@ class videopage():
             pygame.quit()
         except:
             pass
+        self.mainclass.curfunid = -1
         self.videocanvas.destroy()
     def showpygletvideo(self,name):
         pygame.init()
@@ -125,6 +127,8 @@ class videopage():
         pygame.quit()
     def quitpygame(self):
         pygame.quit()
+    def autoplay(self):
+        self.showpygletvideo(self.videolist[0])
 # class showvideo():
 #     def __init__(self,master,id,_winheight,_winwidth):
 #         #常量定义

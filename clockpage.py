@@ -11,6 +11,7 @@ import math
 from backbtn import backbtn
 from title import title
 from background import background
+from wordtovoice import wordtovoice #语音识别
 class clockpage():
     def __init__(self,mainclass,matser,_winheight,_winwidth):
         self.winheight = _winheight
@@ -51,8 +52,8 @@ class clockpage():
         self.xpadding = 20
         self.taskheight =(self.winheight - self.topheight - 8*self.ypadding)/3
         self.taskwidth = (self.winwidth - 6*self.xpadding)/2
-        self.btnwidth = 50
-        self.btnheight = 50
+        self.btnwidth = 30
+        self.btnheight = 30
         self.btnpadding = 10
         self.btnlist = []
         self.detelebtnlist = []
@@ -69,7 +70,7 @@ class clockpage():
         #背景
         bg = background(self.clockpage,self.winheight,self.winwidth,"call")
         #返回按钮
-        backbtn(self.clockpage,self.winheight,self.winwidth)
+        backbtn(self.mainclass,self.clockpage,self.winheight,self.winwidth,6)
         #标题
         title(self.clockpage,self.winheight,self.winwidth,"定时服药提醒")
         self.refresh()
@@ -130,7 +131,7 @@ class clockpage():
             self.canvaslist.append(tk.Canvas(self.clockpage,width=self.taskwidth,height=self.taskheight,highlightthickness=0))
             self.canvaslist[i].place(x=self.xpadding*((i%2)*2+1) +(i%2)*self.taskwidth,y=self.topheight+self.taskheight*int(i/2)+self.ypadding*((int(i/2))*2+1))
             if self.mainclass.tasklist[i][0] != 0:
-                self.canvaslist[i].create_text(self.taskwidth/2,self.taskheight/2,text=self.taskstrlist[i],font=("宋体",30))
+                self.canvaslist[i].create_text(self.taskwidth/2,self.taskheight/2,text=self.taskstrlist[i],font=("宋体",15))
                 self.btnlist.append(tk.Button(self.canvaslist[i],image=self.editimage,width=self.btnwidth,height=self.btnheight,command=self.returnfun(i)))
                 self.detelebtnlist.append(tk.Button(self.canvaslist[i],image=self.closeimage,width=self.btnwidth,height=self.btnheight,command=self.returndetfun(i)))
                 self.btnlist[i].place(x=self.taskwidth-self.btnwidth-self.btnpadding,y=self.btnpadding)
@@ -146,7 +147,25 @@ class clockpage():
             temp.append(int(item))
         return temp
     def back(self):
+        self.mainclass.curfunid = -1
         self.clockpage.destroy()
+    def autosetclock(self,x):
+        resultlist = [
+            [x,0],
+            True,
+            [0,1,2,3,4,5,6]
+        ]
+        flag = False
+        for i in range(0,len(self.mainclass.tasklist)):
+            if self.mainclass.tasklist[i][0] == 0:
+                self.mainclass.tasklist[i]=resultlist
+                flag = True
+                break
+        if not flag:
+            self.mainclass.tasklist[-1] = resultlist
+        wordtovoice(self.mainclass,"设置成功")
+        self.refresh()
+
 class editclock():
     def __init__(self,mainclass,master,_winheight,_winwidth,id,message):
         self.winheight = _winheight
@@ -158,22 +177,22 @@ class editclock():
         self.hour = 8 # 时
         self.min = 0 # 分
         self.repeatflag = True #是否重复
-        self.plusbtnwidth = 50
-        self.paddingy = 200 #各垂直部分之间的间距
+        self.plusbtnwidth = 30
+        self.paddingy = 100 #各垂直部分之间的间距
         self.topy = self.winheight/4
-        self.sidex = 80
-        self.paddingx = 30 #各水平方向的间距
+        self.sidex = 40
+        self.paddingx = 15 #各水平方向的间距
         self.movey = [self.topy,self.topy+self.paddingy,self.topy+self.paddingy*2]
-        self.labelwidth = 50
+        self.labelwidth = 30
         self.boxwidth = int((self.winwidth-self.paddingx*7-self.sidex*2)/8)
-        self.closepadding = 30
+        self.closepadding = 15
         #重复尺寸
-        self.titlebtnwidth = 120
-        self.titlebtnheight = 80
-        self.btnwidth = 120
-        self.btnheight = 60
-        self.cfbtnwidth = 120
-        self.cfbtnheight = 80
+        self.titlebtnwidth = 60
+        self.titlebtnheight = 40
+        self.btnwidth = 60
+        self.btnheight = 30
+        self.cfbtnwidth = 60
+        self.cfbtnheight = 40
         self.movex = [
             [
                 self.sidex,
@@ -292,12 +311,12 @@ class editclock():
     def addmin(self): 
         if (self.min+10)>=60:
             self.hour =(self.hour + 1)%24
-        self.min = (self.min + 10)%60
+        self.min = (self.min + 5)%60
         self.refresh()
     def minusmin(self):
         if (self.min-10)<0:
             self.hour =(self.hour - 1)%24
-        self.min = (self.min - 10)%60
+        self.min = (self.min - 5)%60
         self.refresh()
     def refresh(self):
         self.hournumCanvas.delete("all")
@@ -306,6 +325,15 @@ class editclock():
         self.minnumCanvas.create_text(self.boxwidth/2,self.boxwidth/2,text=self.returntime(self.min),font=("宋体",50))
     #日期点击函数
     def choose(self,x):
+        count =0
+        flagid = 0
+        for i in range(0,len(self.dayableflag)):
+            if self.dayableflag[i]:
+                count = count + 1
+                flagid = i
+        if count<2 and flagid == x:
+            return
+
         self.dayableflag[x] = not self.dayableflag[x]
         self.refreshrepeat()
     def returnfun(self,x):
