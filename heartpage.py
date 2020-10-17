@@ -38,24 +38,6 @@ class heartpage():
         self.historyimage = ImageTk.PhotoImage(
             Image.open("srcimage/history.jpg").resize(
                 (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting0 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting0.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting1 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting1.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting2 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting2.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting3 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting3.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting4 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting4.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
-        self.waiting5 = ImageTk.PhotoImage(
-            Image.open("srcimage/waiting5.jpg").resize(
-                (int(self.startbtnwidth), int(self.startbtnwidth))))
          # 背景
         bg = background(self.heartpage, self.winheight, self.winwidth, "call")
         # 返回按钮
@@ -85,6 +67,7 @@ class heartpage():
 
     def showresult(self, resultlist):
         self.working = False
+        self.waitingpage.close()
         self.startbtn.config(image=self.btnimage)
         result(self.mainclass, self.heartpage,
                self.winheight, self.winwidth, resultlist)
@@ -96,30 +79,7 @@ class heartpage():
                self.winheight, self.winwidth, -1)
 
     def waitinggif(self, threadname, x):
-        flag = 0
-        plus = True
-        while self.working:
-            if flag == 0:
-                self.startbtn.config(image=self.waiting0)
-            if flag == 1:
-                self.startbtn.config(image=self.waiting1)
-            if flag == 2:
-                self.startbtn.config(image=self.waiting2)
-            if flag == 3:
-                self.startbtn.config(image=self.waiting3)
-            if flag == 4:
-                self.startbtn.config(image=self.waiting4)
-            if flag == 5:
-                self.startbtn.config(image=self.waiting5)
-            if plus:
-                flag = flag + 1
-            else:
-                flag = flag - 1
-            if flag == 5:
-                plus = False
-            if flag == 0:
-                plus = True
-            time.sleep(0.2)
+        self.waitingpage = waiting(self,self.heartpage,self.winheight,self.winwidth)
 
     def seehistory(self):
         if not self.working:
@@ -130,8 +90,50 @@ class heartpage():
     def back(self):
         self.mainclass.curfunid = -1
         self.heartpage.destroy()
-
-
+class waiting():
+    def __init__(self,mainclass,master,_winheight,_winwidth):
+        self.mainclass = mainclass
+        self.master = master
+        self.winheight = _winheight
+        self.winwidth = _winwidth
+        self.waitingcanvas = tk.Canvas(self.master,width = self.winwidth,height=self.winheight)
+        self.waitingcanvas.place(x=0,y=0)
+        self.waiting0 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting0.jpg").resize(
+                (int(self.winwidth), int(self.winheight))))
+        self.waiting1 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting1.jpg").resize(
+                (int(self.winwidth), int(self.winheight))))
+        self.waiting2 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting2.jpg").resize(
+                (int(self.winwidth), int(self.winheight))))
+        self.waiting3 = ImageTk.PhotoImage(
+            Image.open("srcimage/waiting3.jpg").resize(
+                (int(self.winwidth), int(self.winheight))))
+        self.gif()
+    def gif(self):
+        flag = 0
+        plus = True
+        while self.mainclass.working:
+            if flag == 0:
+                self.waitingcanvas.create_image(0,0,anchor="nw",image = self.waiting0)
+            if flag == 1:
+                self.waitingcanvas.create_image(0,0,anchor="nw",image = self.waiting1)
+            if flag == 2:
+                self.waitingcanvas.create_image(0,0,anchor="nw",image = self.waiting2)
+            if flag == 3:
+                self.waitingcanvas.create_image(0,0,anchor="nw",image = self.waiting3)
+            if plus:
+                flag = flag + 1
+            else:
+                flag = flag - 1
+            if flag == 3:
+                plus = False
+            if flag == 0:
+                plus = True
+            time.sleep(0.2)
+        def close():
+            self.waitingcanvas.destroy()
 class result():
     def __init__(self, mainclass, master, _winheight, _winwidth, resultlist):
         self.mainclass = mainclass
