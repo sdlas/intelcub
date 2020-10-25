@@ -17,6 +17,7 @@ class callpage():
         self.winheight = _winheight
         self.winwidth = _winwidth
         self.master = matser
+        self.calling = False
         self.callpage = tk.Frame(self.master,bg="pink",height = self.winheight ,width =self.winwidth)
         self.callpage.place(x=0,y=0)
         #背景
@@ -30,9 +31,9 @@ class callpage():
         self.avatarlabellist = []
         self.numberlist = ["15060356168","18792858682","13024999392"]
         #头像高度
-        self.avatarpadding = 100
+        self.avatarpadding = 60
         self.avatarwidth = (self.winwidth - (len(self.childlist)+1)*self.avatarpadding)/len(self.childlist)
-        self.avatrheight = self.avatarwidth/0.618
+        self.avatrheight = self.avatarwidth/0.7
         self.iconwidth = 100
         self.iconpadding = 50
         self.callbtnwidth = 125
@@ -59,6 +60,7 @@ class callpage():
     def call(self):
         callnumber(self.master,self.winheight,self.winwidth)
     def callfamily(self,x):
+        self.calling = True
         callingpage(self,self.callpage,self.winheight,self.winwidth,x)
         ser = serial.Serial("/dev/ttyS0",
                             115200,
@@ -96,7 +98,7 @@ class callingpage():
         self.callingpage = tk.Canvas(self.master,bg="white",width=self.winwidth,height = self.winheight)
         self.callingpage.place(x=0,y=0)
         self.avatarheight = self.winheight
-        self.avatarwidth = self.avatarheight*0.618
+        self.avatarwidth = self.avatarheight*0.7
         self.childlist = ["firstson","secondson","thirdson"]
         self.childimage = ImageTk.PhotoImage(Image.open("srcimage/"+self.childlist[self.id]+".jpg").resize((int(self.avatarwidth),int(self.avatarheight)))) 
         self.callingpage.create_image((self.winwidth-self.avatarwidth)/2,0,anchor="nw",image=self.childimage)
@@ -107,6 +109,7 @@ class callingpage():
         self.combtn.place(x=(self.winwidth-self.comwidth)/2,y=self.winheight*6/8)
     def offphone(self):
         self.mainclass.offphone()
+        self.mainclass.calling = False
         self.callingpage.destroy()
 class callnumber():
     def __init__(self,master,_winheight,_winwidth):

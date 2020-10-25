@@ -40,9 +40,15 @@ class emecallpage():
         time.sleep(300)
         py.mixer.music.stop()
     def back(self):
-        py.mixer.music.stop()
-        self.mainclass.fallflag = False
-        self.mainclass.voicerecing = True
+        try:
+            py.mixer.music.stop()
+        except:
+            pass
         with open('flag.txt','w') as file_handle:   # .txt可以不自己新建,代码会自动新建
             file_handle.write("0")
+        self.mainclass.fallflag = False
+        self.mainclass.voicerecing = True
+        if len(self.mainclass.child)>0:
+            self.mainclass.child[0].back()
+            self.mainclass.child = []
         self.emecallpage.destroy()

@@ -520,12 +520,16 @@ class initface():
             res = client.asr(fp.read(), 'wav', 16000, {
                 'dev_pid': 1537,
             })
-        res = res['result'][0]
+        try:
+            res = res['result'][0]
+        except:
+            pass
         print(res)
         if self.voicerecing:
             if not self.fallflag:
                 if ("照片" in res or "相册" in res) and self.curfunid!=0 and self.curfunid!=7:
                     self.gotophoto()
+                    self.child[0].showbigimage(0)
                     return
                 if ("视频" in res) and self.curfunid!=2 and self.curfunid!=7:
                     self.gotovideo()
@@ -561,6 +565,15 @@ class initface():
                         self.child[0].back()
                         self.child = []
                     return  
+                if self.curfunid == 0:
+                    #图片主场
+                    try:
+                        if "上" in res or "换" in res:
+                            self.child[0].bigimagepage.changeleft()
+                        if "下" in res:
+                            self.child[0].bigimagepage.changeright()
+                    except:
+                        pass
                 if self.curfunid == 1:
                     #音乐主场
                     if "上" in res or "换" in res:
@@ -571,7 +584,7 @@ class initface():
                     if "历史" in res or "查看" in res:
                         self.child[0].seehistory()
                         return
-                    if "开始" in res or "测量" in res and not self.child[0].inhistory:
+                    if ("开始" in res or "测量" in res) and not self.child[0].inhistory:
                         self.child[0].start()
                         return
                     if self.child[0].inhistory:
@@ -585,25 +598,30 @@ class initface():
                             self.child[0].history.changecanvas(1)
                             return
                 if self.curfunid == 6:
-                    temptimelist = ["5点","6点","7点","8点","9点","10点","11点","12点","13点","14点","15点","16点","17点","18点","19点","20点","21点","22点"]
-                    temptimestrlist = ["五点","六点","七点","八点","九点","十点","十一点","十二点","十三点","十四点","十五点","十六点","十七点","十八点","十九点","二十点","二十一点","二十二点"]
-                    temptimestrlist2 = ["五点","六点","七点","八点","九点","是点","是一点","是二点","是三点","是四点","是五点","是六点","是七点","是八点","是九点","二十点","二十一点","二十二点"]
-                    for i in range(0,len(temptimelist)):
-                        if temptimelist[i] in res or temptimestrlist[i] in res or temptimestrlist2[i] in res:
-                            self.child[0].autosetclock(i+5)
-                            return
+                    try:
+                        if not self.child[0].insetting:
+                            temptimelist = ["5点","6点","7点","8点","9点","10点","11点","12点","13点","14点","15点","16点","17点","18点","19点","20点","21点","22点"]
+                            temptimestrlist = ["五点","六点","七点","八点","九点","十点","十一点","十二点","十三点","十四点","十五点","十六点","十七点","十八点","十九点","二十点","二十一点","二十二点"]
+                            temptimestrlist2 = ["五点","六点","七点","八点","九点","是点","是一点","是二点","是三点","是四点","是五点","是六点","是七点","是八点","是九点","二十点","二十一点","二十二点"]
+                            for i in range(0,len(temptimelist)):
+                                if temptimelist[i] in res or temptimestrlist[i] in res or temptimestrlist2[i] in res:
+                                    self.child[0].autosetclock(i+5)
+                                    return
+                    except:
+                        pass
                 if self.curfunid == 5:
-                    if "儿子" in res:
-                        self.child[0].callfamily(2)
-                        return
-                    if "孙子" in res:
-                        self.child[0].callfamily(1)
-                        return
-                    if "女儿" in res:
-                        self.child[0].callfamily(0)
-                        return
+                    if not self.child[0].calling:
+                        if "儿子" in res:
+                            self.child[0].callfamily(2)
+                            return
+                        if "孙子" in res:
+                            self.child[0].callfamily(1)
+                            return
+                        if "女儿" in res:
+                            self.child[0].callfamily(0)
+                            return
             else:
-                if  "没有" in res:
+                if  "没" in res:
                     self.fallflag = False
                     self.child[-1].back()
                 if  "是" in res:

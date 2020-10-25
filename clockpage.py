@@ -15,6 +15,7 @@ from wordtovoice import wordtovoice #语音识别
 class clockpage():
     def __init__(self,mainclass,matser,_winheight,_winwidth):
         self.winheight = _winheight
+        self.insetting = False
         self.winwidth = _winwidth
         self.master = matser
         self.mainclass = mainclass
@@ -85,6 +86,7 @@ class clockpage():
     def returndetfun(self,i):
         return lambda:self.detting(i)
     def setting(self,x):
+        self.insetting = True
         editclock(self,self.clockpage,self.winheight,self.winwidth,x,self.mainclass.tasklist[x])
     def detting(self,x):
         self.mainclass.tasklist[x]=[0]
@@ -309,14 +311,14 @@ class editclock():
         self.refresh()
         
     def addmin(self): 
-        if (self.min+10)>=60:
+        if (self.min+1)>=60:
             self.hour =(self.hour + 1)%24
-        self.min = (self.min + 5)%60
+        self.min = (self.min + 1)%60
         self.refresh()
     def minusmin(self):
-        if (self.min-10)<0:
+        if (self.min-1)<0:
             self.hour =(self.hour - 1)%24
-        self.min = (self.min - 5)%60
+        self.min = (self.min - 1)%60
         self.refresh()
     def refresh(self):
         self.hournumCanvas.delete("all")
@@ -372,4 +374,5 @@ class editclock():
         resultlist.append(daylist)
         self.mainclass.setlist(self.id,resultlist)
         self.mainclass.mainclass.pushinclock()
+        self.mainclass.insetting = False
         self.editpage.destroy()

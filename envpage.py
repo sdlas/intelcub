@@ -83,7 +83,7 @@ class envpage():
                 self.canvaslist[2].config(bg="red")
             for i in range(0,4):
                 self.numcanvaslist[i].delete("all")
-            if tem<20:
+            if tem<=20:
                 self.canvaslist[0].config(bg="yellow")
             elif tem>20 and tem<27:
                 self.canvaslist[0].config(bg="greenyellow")
@@ -118,12 +118,12 @@ class envpage():
                     pm25s = "空气轻度污染"
                 else:
                     pm25s = "空气重度污染"
-                if tem<20:
+                if tem<=20:
                     tems = "温度较低注意保暖"
                 elif tem>20 and tem<27:
                     tems = "温度适宜"
                 else:
-                    tems = "温度较高注意防寒"
+                    tems = "温度较高注意防暑"
                 if humdity<30:
                     hums = "空气较干燥"
                 elif humdity>30 and humdity<70:

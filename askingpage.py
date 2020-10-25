@@ -51,10 +51,13 @@ class askingpage():
         time.sleep(300)
         py.mixer.music.stop()
     def back(self):
-        py.mixer.music.stop()
-        self.working = False
-        self.mainclass.fallflag = False
-        time.sleep(0.5)
+        try:
+            py.mixer.music.stop()
+        except:
+            pass
         with open('flag.txt','w') as file_handle:   # .txt可以不自己新建,代码会自动新建
             file_handle.write("0")
+        
+        self.working = False
+        self.mainclass.fallflag = False
         self.askingpage.destroy()

@@ -52,7 +52,7 @@ class photopage():
         self.photopage.destroy()
         #self.vbar.destory()
     def showbigimage(self,x):
-        bigimage(self.photopage,x,self.winheight,self.winwidth,self.imagelist)
+        self.bigimagepage = bigimage(self.photopage,x,self.winheight,self.winwidth,self.imagelist)
     def returnfun(self,x):
         return lambda:self.showbigimage(x)
     def goodimage(self,id):
@@ -111,24 +111,17 @@ class bigimage():
         self.curid = (self.curid+1)%len(self.imagelist)
         self.showimg =  ImageTk.PhotoImage(self.goodimage(self.curid)) 
         self.pos = self.rightpos(self.curid)
+        self.showimage()
     def changeleft(self):
         self.curid = (self.curid-1)%len(self.imagelist)
         self.showimg =  ImageTk.PhotoImage(self.goodimage(self.curid)) 
         self.pos = self.rightpos(self.curid)
+        self.showimage()
     def close(self):
         self.bigimage.destroy()
     def showimage(self):
-        def video_loop():
-            try:
-                while True:
-                    self.showimagecanvas.create_image(self.pos[0],self.pos[1],anchor='nw',image=self.showimg)  
-                    #canvas4.create_image(0,0,anchor='nw',image=picture1) 
-                    self.master.update_idletasks()  #最重要的更新是靠这两句来实现
-                    self.master.update()
-            except:
-                self.close()
-            
-        video_loop()
+        self.showimagecanvas.create_image(self.pos[0],self.pos[1],anchor='nw',image=self.showimg)  
+       
         #self.face1.mainloop()
     #返回合适比例的图片
     def goodimage(self,id):
